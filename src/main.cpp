@@ -3,6 +3,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <array>
+#include <cstdlib>
 
 // Classe TicTacToe
 class TicTacToe {
@@ -49,23 +50,36 @@ public:
             std::cout << "essa jogada nao eh valida";
             return false;
         }
+
+       // while (current_player != player) {  FAZER ISSO
+       // turn_cv.wait(lock);
+       // }
+
+        while(player == 'X') {
         
         board_mutex.lock();
         if(player == 'X' && board[row][col] == '-'){  
-            board[row][col]= 'X'; // secao critica, escrevendo em recurso compartilhado 
+            board[row][col]= 'X'; // secao critica, escrevendo em recurso compartilhado
+            current_player = 'O';
+            //wait
             board_mutex.unlock();
+            //wait ou notify -- nao sei se a variavel de condicao deve ser usada aqui
             return true;
-        }
+        }}
+
+        while(player == 'O'){
         else if(player == 'O' && board[row][col] == '-') {
+            //wait
             board[row][col] = 'O'; // secao critica, escrevendo em recurso compartilhado 
+             current_player = 'X'
             board_mutex.unlock();
+            //notify //wait -- nao sei se a variavel de condicao deve ser usada aqui
             return true;
-        }
+        }}
 
         board_mutex.unlock();
         return false;
-        
-    }
+        }
 
     bool check_win(char player) {
         // Verificar se o jogador atual venceu o jogo
@@ -171,11 +185,11 @@ public:
 
     void play() {
         // Executar jogadas de acordo com a estratégia escolhida
-        if(strategy == sequencial){
-            play_sequential;
+        if(strategy == "sequencial"){
+            play_sequential();
     }
-        else if(strategy == aleatorio){
-            play_random;
+        else if(strategy == "aleatorio"){
+            play_random();
         }
 
 private:
@@ -200,7 +214,7 @@ private:
                 // gera uma posicao aleatoria entre 0 e 2
                     int linha_aleatoria = std::rand() % 3;
                     int coluna_aleatoria = std::rand() % 3;
-                    if(g.make_move(symbol,linha_aleatoria, coluna_aleatoria) || is_game_over() ){
+                    if(game.make_move(symbol,linha_aleatoria, coluna_aleatoria) || game.is_game_over() ){
                         break;
                     }
                 
