@@ -183,7 +183,7 @@ private:
 
 // Função principal
 
-TicTacToe board;  //  tabuleiro compartilhado entre as threads
+// avaliar isso  --- TicTacToe board;  //  tabuleiro compartilhado entre as threads
 
 int main() {
     // Inicializar o jogo e os jogadores
