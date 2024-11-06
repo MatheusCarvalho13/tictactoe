@@ -69,18 +69,25 @@ public:
 
     if(player == 'X'){
         if( board[0][0] == 'X' && board[1][1] == 'X' && board[2][2] == 'X') {
+            winner = 'X';
             return true;}
         else if(board[0][0] == 'X' && board[0][1] == 'X' && board[0][2] == 'X'){
+            winner = 'X';
             return true;}
         else if(board[1][0] == 'X' && board[1][1] == 'X' && board[1][2] == 'X'){
+            winner = 'X';
             return true;}
         else if(board[2][0] == 'X' && board[2][1] == 'X' && board[2][2] == 'X'){
+            winner = 'X';
             return true;}
         else if(board[0][0] == 'X' && board[1][0] == 'X' && board[2][0] == 'X'){
+            winner = 'X';
             return true;}
         else if(board[0][1] == 'X' && board[1][1] == 'X' && board[2][1] == 'X'){
+            winner = 'X';
             return true;}
         else if(board[0][2] == 'X' && board[1][2] == 'X' && board[2][2] == 'X'){
+            winner = 'X';
             return true;}
         return false;}
 
@@ -88,21 +95,28 @@ public:
 
     if(player == 'O'){
         if( board[0][0] == 'O' && board[1][1] == 'O' && board[2][2] == 'O') {
+            winner = 'O';;
             return true;}
         else if(board[0][0] == 'O' && board[0][1] == 'O' && board[0][2] == 'O'){
+            winner = 'O';
             return true;}
         else if(board[1][0] == 'O' && board[1][1] == 'O' && board[1][2] == 'O'){
+            winner = 'O';
             return true;}
         else if(board[2][0] == 'O' && board[2][1] == 'O' && board[2][2] == 'O'){
+            winner = 'O';
             return true;}
         else if(board[0][0] == 'O' && board[1][0] == 'O' && board[2][0] == 'O'){
+            winner = 'O';
             return true;}
         else if(board[0][1] == 'O' && board[1][1] == 'O' && board[2][1] == 'O'){
+            winner = 'O';
             return true;}
         else if(board[0][2] == 'O' && board[1][2] == 'O' && board[2][2] == 'O'){
+            winner = 'O';
             return true;}
         return false;}
-
+        
         return false; // retorna false se um jogador nao 'X' ou 'O' for avaliado
     }
 
@@ -129,13 +143,18 @@ public:
             }
         }
 
-        
+        return true;
     }
 
     char get_winner() {
         // Retornar o vencedor do jogo ('X', 'O', ou 'D' para empate)
+
+        if(is_game_over()){
+        return winner;   
     }
-};
+        else{
+            return 'Q';}
+    }
 
 // Classe Player
 class Player {
