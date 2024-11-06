@@ -40,27 +40,30 @@ public:
         }
     }
 
-    bool make_move(char player, int row, int col) {
+    bool make_move(char player, int row, int col) { // retorna true se a escrita foi executada, false caso contrario
         // Implementar a lógica para realizar uma jogada no tabuleiro
         // Utilizar mutex para controle de acesso
         // Utilizar variável de condição para alternância de turnos
 
-        if( row>=3 || col>=3) {
-            cout << "essa jogada nao eh valida";
+        if( row>=3 || row<0 || col>=3 || col<0) {
+            std::cout << "essa jogada nao eh valida";
             return false;
         }
-
-        if(player == 'X'){  
-            board_mutex.lock();
-            board[row][col] = 'X'; // secao critica, escrevendo em recurso compartilhado 
+        
+        board_mutex.lock();
+        if(player == 'X' && board[row][col] == '-'){  
+            board[row][col]= 'X'; // secao critica, escrevendo em recurso compartilhado 
             board_mutex.unlock();
+            return true;
         }
-        else if(player == 'O') {
-            board_mutex.lock();
+        else if(player == 'O' && board[row][col] == '-') {
             board[row][col] = 'O'; // secao critica, escrevendo em recurso compartilhado 
             board_mutex.unlock();
+            return true;
         }
-        
+
+        board_mutex.unlock();
+        return false;
         
     }
 
@@ -123,17 +126,17 @@ public:
     bool check_draw() {
         // Verificar se houve um empate, retorna false se nao ha empate, retorna true se ha empate
 
-        if ( check_win('X') || check_win('O') ){
-            return false;}   // nesse caso ha um vencedor
-        else{
-            return true; // ha empate
-        }
-    }
+        if(is_game_over()){
+            if ( check_win('X') || check_win('O') ){
+                return false;}   // nesse caso ha um vencedor
+            else{
+                return true;}} // ha empate
 
+        return false;} // nesse caso o jogo nao acabou
 
 
     bool is_game_over() {
-        // Retornar se o jogo terminou
+        // Retornar true se o jogo terminou
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j){ 
@@ -149,11 +152,10 @@ public:
     char get_winner() {
         // Retornar o vencedor do jogo ('X', 'O', ou 'D' para empate)
 
-        if(is_game_over()){
-        return winner;   
-    }
+        if(is_game_over() && (!check_draw()) ){
+            return winner; }
         else{
-            return 'Q';}
+            return 'D';} 
     }
 
 // Classe Player
@@ -169,17 +171,41 @@ public:
 
     void play() {
         // Executar jogadas de acordo com a estratégia escolhida
+        if(strategy == sequencial){
+            play_sequential;
     }
+        else if(strategy == aleatorio){
+            play_random;
+        }
 
 private:
     void play_sequential() {
         // Implementar a estratégia sequencial de jogadas
-    }
+        int escreveu = 0;
+         for (int i = 0; i < 3; i=i+1;) { 
+            for (int j = 0; j < 3; j=j+1;) {
+                if(game.make_move(symbol,i,j)){   //retorna true se conseguiu escrever no board
+                    escreveu = 1;
+                    break;
+                    }}
+            if(escreveu == 1){
+                break;
+            }}
+        }
 
     void play_random() {
         // Implementar a estratégia aleatória de jogadas
-    }
-};
+
+                while(true){
+                // gera uma posicao aleatoria entre 0 e 2
+                    int linha_aleatoria = std::rand() % 3;
+                    int coluna_aleatoria = std::rand() % 3;
+                    if(g.make_move(symbol,linha_aleatoria, coluna_aleatoria) || is_game_over() ){
+                        break;
+                    }
+                
+                }
+        }
 
 // Função principal
 
@@ -188,11 +214,23 @@ private:
 int main() {
     // Inicializar o jogo e os jogadores
 
+    TicTacToe tabuleiro;
+    
+
     // Criar as threads para os jogadores
+
+    std::thread jogador1(&tabueiro,'X', "aleatorio");
+    std::thread jogador2(&tabueiro,'O', "aleatorio");
+    
 
     // Aguardar o término das threads
 
+    t1.join();
+    t2.join();
+
     // Exibir o resultado final do jogo
+
+    tabuleiro.display_board();
 
     return 0;
 }
