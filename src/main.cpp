@@ -44,18 +44,92 @@ public:
         // Implementar a lógica para realizar uma jogada no tabuleiro
         // Utilizar mutex para controle de acesso
         // Utilizar variável de condição para alternância de turnos
+
+        if( row>=3 || col>=3) {
+            cout << "essa jogada nao eh valida";
+            return false;
+        }
+
+        if(player == 'X'){  
+            board_mutex.lock();
+            board[row][col] = 'X'; // secao critica, escrevendo em recurso compartilhado 
+            board_mutex.unlock();
+        }
+        else if(player == 'O') {
+            board_mutex.lock();
+            board[row][col] = 'O'; // secao critica, escrevendo em recurso compartilhado 
+            board_mutex.unlock();
+        }
+        
+        
     }
 
     bool check_win(char player) {
         // Verificar se o jogador atual venceu o jogo
+
+    if(player == 'X'){
+        if( board[0][0] == 'X' && board[1][1] == 'X' && board[2][2] == 'X') {
+            return true;}
+        else if(board[0][0] == 'X' && board[0][1] == 'X' && board[0][2] == 'X'){
+            return true;}
+        else if(board[1][0] == 'X' && board[1][1] == 'X' && board[1][2] == 'X'){
+            return true;}
+        else if(board[2][0] == 'X' && board[2][1] == 'X' && board[2][2] == 'X'){
+            return true;}
+        else if(board[0][0] == 'X' && board[1][0] == 'X' && board[2][0] == 'X'){
+            return true;}
+        else if(board[0][1] == 'X' && board[1][1] == 'X' && board[2][1] == 'X'){
+            return true;}
+        else if(board[0][2] == 'X' && board[1][2] == 'X' && board[2][2] == 'X'){
+            return true;}
+        return false;}
+
+        
+
+    if(player == 'O'){
+        if( board[0][0] == 'O' && board[1][1] == 'O' && board[2][2] == 'O') {
+            return true;}
+        else if(board[0][0] == 'O' && board[0][1] == 'O' && board[0][2] == 'O'){
+            return true;}
+        else if(board[1][0] == 'O' && board[1][1] == 'O' && board[1][2] == 'O'){
+            return true;}
+        else if(board[2][0] == 'O' && board[2][1] == 'O' && board[2][2] == 'O'){
+            return true;}
+        else if(board[0][0] == 'O' && board[1][0] == 'O' && board[2][0] == 'O'){
+            return true;}
+        else if(board[0][1] == 'O' && board[1][1] == 'O' && board[2][1] == 'O'){
+            return true;}
+        else if(board[0][2] == 'O' && board[1][2] == 'O' && board[2][2] == 'O'){
+            return true;}
+        return false;}
+
+        return false; // retorna false se um jogador nao 'X' ou 'O' for avaliado
     }
 
     bool check_draw() {
-        // Verificar se houve um empate
+        // Verificar se houve um empate, retorna false se nao ha empate, retorna true se ha empate
+
+        if ( check_win('X') || check_win('O') ){
+            return false;}   // nesse caso ha um vencedor
+        else{
+            return true; // ha empate
+        }
     }
+
+
 
     bool is_game_over() {
         // Retornar se o jogo terminou
+
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j){ 
+                if (board[i][j] == '-') {
+                return false;                 
+                }
+            }
+        }
+
+        
     }
 
     char get_winner() {
