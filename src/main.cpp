@@ -17,10 +17,27 @@ private:
 public:
     TicTacToe() {
         // Inicializar o tabuleiro e as variáveis do jogo
+        current_player = 'X';
+        game_over = false;
+        winner = 'n';
+
+        for (int i = 0; i < 3; ++i) { // iniciando o tabuleiro
+            for (int j = 0; j < 3; ++j) {
+                board[i][j] = '-';
+            }
+        }
+    
     }
 
     void display_board() {
         // Exibir o tabuleiro no console
+            // Loop duplo para imprimir cada elemento do tabuleiro
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                std::cout << board[i][j] << ' ';
+            }
+        std::cout << '\n'; // nova linha
+        }
     }
 
     bool make_move(char player, int row, int col) {
@@ -72,6 +89,9 @@ private:
 };
 
 // Função principal
+
+TicTacToe board;  //  tabuleiro compartilhado entre as threads
+
 int main() {
     // Inicializar o jogo e os jogadores
 
