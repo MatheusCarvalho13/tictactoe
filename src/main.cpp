@@ -46,38 +46,41 @@ public:
         // Utilizar mutex para controle de acesso
         // Utilizar variável de condição para alternância de turnos
 
+    std::unique_lock<std::mutex> lock(board_mutex); 
+
         if( row>=3 || row<0 || col>=3 || col<0) {
             std::cout << "essa jogada nao eh valida";
             return false;
         }
 
-       // while (current_player != player) {  FAZER ISSO
-       // turn_cv.wait(lock);
-       // }
-
-        while(player == 'X') {
-        
+       
         board_mutex.lock();
+        
+        while (current_player != player) {  //bloqueia o jogador
+        turn_cv.wait(lock);
+        }
+
+     
         if(player == 'X' && board[row][col] == '-'){  
             board[row][col]= 'X'; // secao critica, escrevendo em recurso compartilhado
             current_player = 'O';
-            //wait
+            turn_cv.notify(lock);
             board_mutex.unlock();
-            //wait ou notify -- nao sei se a variavel de condicao deve ser usada aqui
             return true;
-        }}
+        }
 
-        while(player == 'O'){
+       
         else if(player == 'O' && board[row][col] == '-') {
             //wait
             board[row][col] = 'O'; // secao critica, escrevendo em recurso compartilhado 
-             current_player = 'X'
+            current_player = 'X';
+            turn_cv.notify();
             board_mutex.unlock();
-            //notify //wait -- nao sei se a variavel de condicao deve ser usada aqui
             return true;
-        }}
+        }
 
-        board_mutex.unlock();
+    
+            
         return false;
         }
 
@@ -195,6 +198,9 @@ public:
 private:
     void play_sequential() {
         // Implementar a estratégia sequencial de jogadas
+
+        while(is_game_over()) {
+        
         int escreveu = 0;
          for (int i = 0; i < 3; i=i+1;) { 
             for (int j = 0; j < 3; j=j+1;) {
@@ -205,25 +211,23 @@ private:
             if(escreveu == 1){
                 break;
             }}
-        }
+        }}
 
     void play_random() {
         // Implementar a estratégia aleatória de jogadas
 
+            while(is_game_over()){
                 while(true){
                 // gera uma posicao aleatoria entre 0 e 2
                     int linha_aleatoria = std::rand() % 3;
                     int coluna_aleatoria = std::rand() % 3;
-                    if(game.make_move(symbol,linha_aleatoria, coluna_aleatoria) || game.is_game_over() ){
+                    if(game.make_move(symbol,linha_aleatoria, coluna_aleatoria)){
                         break;
                     }
                 
                 }
-        }
+        }}
 
-// Função principal
-
-// avaliar isso  --- TicTacToe board;  //  tabuleiro compartilhado entre as threads
 
 int main() {
     // Inicializar o jogo e os jogadores
@@ -233,8 +237,8 @@ int main() {
 
     // Criar as threads para os jogadores
 
-    std::thread jogador1(&tabueiro,'X', "aleatorio");
-    std::thread jogador2(&tabueiro,'O', "aleatorio");
+    std::thread jogador1(&tabuleiro,'X', "aleatorio");
+    std::thread jogador2(&tabuleiro,'O', "aleatorio");
     
 
     // Aguardar o término das threads
