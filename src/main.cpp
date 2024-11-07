@@ -54,9 +54,9 @@ public:
         }
 
        
-        board_mutex.lock();
+       
         
-        while (current_player != player) {  //bloqueia o jogador
+        while (current_player != player) {  //bloqueia o jogador ate que seja sua vez
         turn_cv.wait(lock);
         }
 
@@ -65,7 +65,7 @@ public:
             board[row][col]= 'X'; // secao critica, escrevendo em recurso compartilhado
             current_player = 'O';
             turn_cv.notify(lock);
-            board_mutex.unlock();
+           
             return true;
         }
 
@@ -75,7 +75,7 @@ public:
             board[row][col] = 'O'; // secao critica, escrevendo em recurso compartilhado 
             current_player = 'X';
             turn_cv.notify();
-            board_mutex.unlock();
+           
             return true;
         }
 
@@ -199,11 +199,11 @@ private:
     void play_sequential() {
         // Implementar a estratégia sequencial de jogadas
 
-        while(is_game_over()) {
+        while(!is_game_over()) {
         
         int escreveu = 0;
-         for (int i = 0; i < 3; i=i+1;) { 
-            for (int j = 0; j < 3; j=j+1;) {
+         for (int i = 0; i < 3; i=i+1) { 
+            for (int j = 0; j < 3; j=j+1) {
                 if(game.make_move(symbol,i,j)){   //retorna true se conseguiu escrever no board
                     escreveu = 1;
                     break;
@@ -233,18 +233,21 @@ int main() {
     // Inicializar o jogo e os jogadores
 
     TicTacToe tabuleiro;
+
+    Player p1(tabuleiro, 'X', "aleatorio");
+    Player p2(tabuleiro, 'O', "aleatorio");
     
 
     // Criar as threads para os jogadores
 
-    std::thread jogador1(&tabuleiro,'X', "aleatorio");
-    std::thread jogador2(&tabuleiro,'O', "aleatorio");
+    std::thread jogador1(&Player::play, &p1);
+    std::thread jogador2(&Player::play, &p2);
     
 
     // Aguardar o término das threads
 
-    t1.join();
-    t2.join();
+    jogador1.join();
+    jogador2.join();
 
     // Exibir o resultado final do jogo
 
